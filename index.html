@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Predicting Outcome future NBA Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Predicting Outcome future NBA Games</h1>
+      <h2 class="project-tagline"></h2>
+      <a href="https://github.gatech.edu/zyang453/ML-Project" class="btn">View on GitHub</a>
+    </section>
+
+    <section class="main-content">
+      <h3>
+        <a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>INTRODUCTION
+      </h3>
+      <p>
+        As the sports gambling industry continues to grow and states such as Nevada are beginning to bring in upwards of 60 Million dollars 
+        in monthly revenue(Lock,2021). It becomes increasingly important to have relevant data and predictive models for how a team is going 
+        to perform under ever-changing circumstances. In leagues such as the NBA, there are so many variables that can impact a team's performance.
+      </p>
+      <p>
+        <img src="Image/PP1.png" alt="4" class="incline"/>
+      </p>
+      <p>
+        There exists a plethora of data that can be used in predicting the performance of a team and how much they will score. 
+        This data can be used to create predictive models that will determine how successful an NBA team will be not only for fans 
+        but for the millions of dollars used on gambling.
+      <p/>
+    <h3>
+      <a id="Problem Definition" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Problem Definition
+    </h3>
+    <p>
+        The model we will create will predict the winner of a game given a certain team matchup.
+    </p>
+    <h3>
+      <a id="Data Collection" class="anchor" href="#creating-pages-manually" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Data Collection
+    </h3>
+    <p>
+        The data that we used was sourced from Kaggle under “NBA games data”. The dataset is a collection of every single NBA game 
+        from 2004 to the end of 2020. According to the description, all data was collected from nba.com/stats with a custom web snippet. 
+        The whole collection has 5 different datasets, each has its own focus. For example, one focuses on each player's performances. 
+        We decided to use the games.csv, which provides a team based general statistics such as number of free throw scored, percentage 
+        of field goal, etc. We believe this will give us statistics that we need to have a birds eye view of each match in order to 
+        build our prediction model.
+    </p>
+
+      <h3>
+        <a id="Methods" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Methods
+      </h3>
+      <h4>
+        <a id="Data Cleaning" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Data Cleaning
+      </h4>
+      <p>
+          Before getting into feature analysis, we first did some data clean up. By using Pandas, we first removed columns 
+          that aren’t relevant such as game date, game ID, and game status. Then, we replaced team ID for both the home team and component 
+          team with the actual team nickname, for instance, Atlanta Hawks became Hawks, to provide a more human readable format. Along with that 
+          we limited our algorithms to only consider data from 2016 to 2018. Data from 2016 to 2018 is our training data and we will use 2019 as 
+          test data. The reason we chose this date range instead of 2020 or 2021 is because the 2019 season is the most recent season that is 
+          complete and "normal". The 2020 season had half the games as a normal season due to the COVID outbreak.
+      </p>
+      <p>
+          <img src="Image/data.png" alt="4" class="incline" />
+      </p>
+      <h4>
+          <a id="Principal Component Analysis" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Principal Component Analysis
+      </h4>
+      <p>
+          There are a total of 12 features in each game to provide an overview of how good a team performs. They are Points scored, 
+          Field goal percentage, Free throw percentage, Assists per game, and Rebounds per game (6 for each team). We want to optimize the number of 
+          features used in the prediction by employing Principal Component Analysis. By passing in the non compressed data and returning a bar graph 
+          that shows how much each feature contributes to the variance, we come up with:
+      </p>
+      <p>
+          <img src="Image/PCA.png" alt="4" class="incline" />
+      </p>
+      <p>
+          As you can see, the first 4 components contribute the most to the variance. In fact, Home Points scored, Home FG percentage, 
+          Home 3 percentage, and Away points scored count for ~34 + ~32 + ~16 + ~12 = ~94% of the variance! Rebounds and assists and all 
+          the other components only account for about ~6% of the variance. So, we can take the remaining components out of consideration.
+      </p>
+      <h4>
+          <a id="Composite Score Calculation" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Composite Score Calculation
+      </h4>
+      <p>
+          Utilizing the components we deemed useful with PCA, we came up with a 
+          method that gives us a composite score that measures the team performance.
+      </p>
+      <p>
+          The basic idea is to measure the home team’s offense against the opposing team’s defense, 
+          and then measuring the home team’s defense against the opposing team’s offense.
+      </p>
+      <p>
+          More specifically, we combine the home team’s field goal percentage with the opposing team’s points allowed, 
+          and then combine the home team’s points scored with the opposing team’s points allowed. We then average the defense score 
+          with the offense score to get an overall performance score for a team during that game.
+      </p>
+      <p>
+          The code for this equation can be seen below:
+      </p>
+      <p>
+          <img src="Image/composite_score.png" alt="4" class="incline" />
+      </p>
+      <h4>
+          <a id="Graph Production/Analysis" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Graph Production/Analysis
+      </h4>
+      <p>
+          Finally, we measure the total points scored against the composite score for each team. We then find the average 
+          composite score (average performance) for each team, and plugging that value into the line of best fit equation for each team, 
+          we find the average points scored in a game. We then compare the average points scored, and whoever has the higher score is 
+          deemed the predicted winner.
+      </p>
+      <p>
+          <img src="Image/prediction_graph.png" alt="4" class="incline" />
+      </p>
+      <h3>
+          <a id="Results" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Results
+      </h3>
+      <p>
+          We used the data found from the 2016-2018 seasons to predict games in the 2019 season. We decided to try
+          and predict games in the 2019 season because this was the last regular season before the COVID-19 outbreak, which
+          messed up a lot of future NBA games. The COVID-19 outbreak caused the 2020 season to be cancelled midway through 
+          and a lot of games were left unplayed, leaving an incomplete dataset. The way we tested our model was with a simple for loop 
+          which loops through all of the 2019 games and checks to see if our prediction was right on a per game basis.
+      </p>
+      <p>
+          The code for the testing is shown below:
+      </p>
+      <p>
+          <img src="Image/testing.png" alt="4" class="incline" />
+      </p>
+      <p>
+          As you can see, we achieved an incredible accuracy rate of over 75%, which is quite good considering the variability 
+          of the NBA and all the different factors that account for whether a team wins or not. In the future, to account for the 
+          variability, instead of simply outputting the predicted winner(because winning margins are not stable at all), we could 
+          tweak our program to output the percentage chance of a certain team winning, as well as a variance score - the variance score 
+          will take into account how much a team’s composite score has changed over the years, and the more it has changed, the higher the 
+          variance score will be. We could also use a computer generated composite score equation instead of our own, which would be 
+          able to detect differences in defenses and offenses that humans cannot.
+      </p>
+      <p>
+          An ideal team would have a high chance of winning and a low variance score.
+      </p>
+
+      <h3>
+        <a id="Discussions" class="anchor" href="#support-or-contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Discussions
+      </h3>
+      <p>
+        One potential difficulty we may face while analyzing data is the inevitable outliers we will encounter(The occasional games that are outside the norm for a team). While it may be extra work, taking these games into consideration and finding patterns within them could help us predict when an outlier game may happen, improving our model significantly. Another difficulty we may face is data storage. If we decide to take this project outside the scope of the class and make the data publicly available, we may need to host our own servers/look into AWS/azure for
+      </p>
+      <p>
+        If we are successful with the execution of the project, our models could be used by sports commentators/fans around the world to help with their analyses. Our potential outlier pattern detection could help with research in human nature/figuring out why these outliers happen.
+      </p>
+      <h3>
+        <a id="Reference" class="anchor" href="#support-or-contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reference
+      </h3>
+      <p>
+        [1] Weiner, J. (2021, January 5). Predicting the outcome of NBA games with Machine Learning | by Josh Weiner | Jan, 2021 | Towards Data Science. Medium; Towards Data Science. https://towardsdatascience.com/predicting-the-outcome-of-nba-games-with-machine-learning-a810bb768f20
+      </p>
+      <p>
+        [2] Lock, S. (2021, February 15). Monthly sports betting revenue in Nevada 2020. Retrieved March 02, 2021, from https://www.statista.com/statistics/1083255/monthly-sports-betting-revenue-nevada/
+      </p>
+      <p>
+        [3] Bunker, R., & Thabtah, F. (2017, September 19). A machine learning framework for sport result prediction. Retrieved March 02, 2021, from https://www.sciencedirect.com/science/article/pii/S2210832717301485
+      </p>
+      <h3>
+        <a id="Members" class="anchor" href="#support-or-contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Members
+      </h3>
+      <ol>
+        <li>Zhuobin (Ben) Yang</li>
+        <li>Aayush Shah</li>
+        <li>Dante Allen</li>
+        <li>Ruturaj Patil</li>
+        <li>Vineeth Krishnamurthy</li>
+      </ol>
+
+    </section>
+
+  
+  </body>
+</html>
